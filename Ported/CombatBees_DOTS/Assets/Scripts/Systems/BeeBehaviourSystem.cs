@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 
@@ -12,6 +13,9 @@ public partial class BeeBehaviourSystem : SystemBase
     private EntityQuery honeyBeeQuery;
     private EntityQuery yellowJacketQuery;
     
+    private EntityQuery honeyBeeHiveQuery;
+    private EntityQuery yellowJacketHiveQuery;
+
     protected override void OnCreate()
     {
         // // do these queries get updated? TODO
@@ -22,13 +26,24 @@ public partial class BeeBehaviourSystem : SystemBase
         });
         honeyBeeQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(FactionHoneyBee), typeof(Translation)},
+            All = new ComponentType[] { typeof(Bee), typeof(FactionHoneyBee), typeof(Translation)},
             None = new ComponentType[] { typeof(Dead) }
         });
         yellowJacketQuery = GetEntityQuery(new EntityQueryDesc
         {
-            All = new ComponentType[] { typeof(FactionYellowJacket), typeof(Translation)},
+            All = new ComponentType[] { typeof(Bee), typeof(FactionYellowJacket), typeof(Translation)},
             None = new ComponentType[] { typeof(Dead) }
+        });
+        
+        /// Beehive entities
+        honeyBeeHiveQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] {typeof(BeeSpawner), typeof(FactionHoneyBee)}
+        });
+        
+        yellowJacketHiveQuery = GetEntityQuery(new EntityQueryDesc
+        {
+            All = new ComponentType[] {typeof(BeeSpawner), typeof(FactionYellowJacket)}
         });
     }
 
@@ -41,15 +56,19 @@ public partial class BeeBehaviourSystem : SystemBase
         NativeArray<Entity> availableFoodArray = availableFoodQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<Entity> honeyBeesArray = honeyBeeQuery.ToEntityArray(Allocator.TempJob);
         NativeArray<Entity> yellowJacketsArray = yellowJacketQuery.ToEntityArray(Allocator.TempJob);
-
-        // Debug.Log($"[{this.GetType().ToString()}] honey bee count: {honeyBeesArray.Length}");
-        // Debug.Log($"[{this.GetType().ToString()}] yellowjacket count: {yellowJacketsArray.Length}");
+        
+        // TODO is there a way to cache the entity without having to query each time?
+        // But still be able to use it in the Entities ForEach
+        NativeArray<Entity> honeyBeeHiveArray = honeyBeeHiveQuery.ToEntityArray(Allocator.TempJob);
+        NativeArray<Entity> yellowJacketHiveArray = yellowJacketHiveQuery.ToEntityArray(Allocator.TempJob);
+        
         Entities
             .WithAll<Bee>()
             .WithNone<Dead>()
-            // .WithReadOnly<NativeArray<Entity>>(availableFoodArray)
-            // .WithDisposeOnCompletion(availableFoodArray)
-            .ForEach((Entity entity, ref Bee bee, in Translation translation) =>
+            .WithDisposeOnCompletion(availableFoodArray)
+            .WithDisposeOnCompletion(honeyBeesArray)
+            .WithDisposeOnCompletion(yellowJacketsArray)
+            .ForEach((Entity entity, TransformAspect transform, ref Bee bee) =>
             {
                 // Assign jobs to idle bees
                 if (bee.State == Bee.BeeState.Idle)
@@ -63,12 +82,12 @@ public partial class BeeBehaviourSystem : SystemBase
                         // TODO CHECK AGAIN IF FOOD IS ALREADY BEING HELD
                         int randomFood = random.NextInt(availableFoodArray.Length);
                         bee.Movement.Target = availableFoodArray[randomFood];
-                        Debug.Log($"ASSIGN AS FOOD GATHERER");
+                        // Debug.Log($"ASSIGN AS FOOD GATHERER");
                     }
                     else if (bee.State == Bee.BeeState.Attacking)
                     {
                         // TOdo filter to check for dead bees
-                        Debug.Log($"ASSIGN AS ATTACKER");
+                        // Debug.Log($"ASSIGN AS ATTACKER");
                         if (bee.Faction == BeeFaction.HoneyBee)
                         {
                             int randomEnemy = random.NextInt(yellowJacketsArray.Length);
@@ -82,6 +101,33 @@ public partial class BeeBehaviourSystem : SystemBase
                         }
                     }
                 }
+                else
+                {
+                    if (bee.Movement.Target != Entity.Null)
+                    {
+                        var pos = transform.Position;
+                        var targetPosition = GetComponent<Translation>(bee.Movement.Target).Value;
+                        // Debug.Log($"distance to target: {math.distance(pos, targetPosition)}");
+                        // Check if reached target
+                        if (math.distance(pos, targetPosition) <= 0.5f)
+                        {
+                            if (bee.State == Bee.BeeState.GatheringFood)
+                            {
+                                // Todo make food follow the holder bee movement...
+                                ecb.AddComponent(bee.Movement.Target, new HolderBee() {Holder = entity});
+                                // TODO REMOVE COMPONENT LATER
+                                bee.State = Bee.BeeState.ReturningFood;
+        
+                                bee.Movement.Target = bee.Faction switch
+                                {
+                                    BeeFaction.HoneyBee => honeyBeeHiveArray[0],
+                                    BeeFaction.YellowJacket => yellowJacketHiveArray[0],
+                                };
+                            }
+                        }
+                    }
+                }
+                
             }).Run();
         ecb.Playback(EntityManager);
         ecb.Dispose();

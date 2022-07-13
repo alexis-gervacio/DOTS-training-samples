@@ -5,7 +5,7 @@ class BeeSpawnerAuthoring : UnityEngine.MonoBehaviour
 {
     public UnityEngine.GameObject BeePrefab;
     public int BeeCount;
-    // public BeeFaction Faction;
+    public BeeFaction Faction;
     public UnityEngine.Transform SpawnPoint;
 }
 
@@ -18,8 +18,17 @@ class BeeSpawnerBaker : Baker<BeeSpawnerAuthoring>
             BeePrefab = GetEntity(authoring.BeePrefab),
             BeeCount = authoring.BeeCount,
             // Bake the spawn position
-            SpawnPoint = authoring.SpawnPoint.position,
-            // Faction = authoring.Faction
+            SpawnPoint = authoring.SpawnPoint.position
         });
+        //TODO hardcode is ugly
+        switch (authoring.Faction)
+        {
+            case BeeFaction.HoneyBee:
+                AddComponent<FactionHoneyBee>();
+                break;
+            case BeeFaction.YellowJacket:
+                AddComponent<FactionYellowJacket>();
+                break;
+        }
     }
 }

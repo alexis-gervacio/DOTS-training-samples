@@ -15,7 +15,7 @@ struct Bee : IComponentData
         /// ALX: if returning food, can we assume that bee has successfully gotten resource and
         /// cannot drop it unless they are killed by other faction
         /// </summary>
-        // ReturningFood,
+        ReturningFood,
         Attacking
     }
 }

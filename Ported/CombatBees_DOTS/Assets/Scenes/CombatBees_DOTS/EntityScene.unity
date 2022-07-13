@@ -480,7 +480,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1143994547}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -43, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -502,6 +502,7 @@ MonoBehaviour:
   BeePrefab: {fileID: 1989798911935835396, guid: 5ce1a582e0ff64f148e656547231a2e6,
     type: 3}
   BeeCount: 10
+  Faction: 0
   SpawnPoint: {fileID: 1663377176}
 --- !u!1 &1331738288
 GameObject:
@@ -638,7 +639,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2124394298}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 43, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -660,6 +661,7 @@ MonoBehaviour:
   BeePrefab: {fileID: 1989798911935835396, guid: 068623536537741cb9281a227ef004dc,
     type: 3}
   BeeCount: 10
+  Faction: 1
   SpawnPoint: {fileID: 468548700}
 --- !u!1001 &539096899724634113
 PrefabInstance:

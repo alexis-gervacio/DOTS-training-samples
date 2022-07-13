@@ -15,7 +15,6 @@ partial class BeeMovementSystem : SystemBase
         // So we need to copy the value we need (DeltaTime) into a local variable.
         var dt = Time.DeltaTime;
 
-        var field = GetSingleton<Field>();
         
         // Entities.ForEach is an older approach to processing queries. Its use is not
         // encouraged, but it remains convenient until we get feature parity with IFE.
@@ -27,12 +26,12 @@ partial class BeeMovementSystem : SystemBase
 
                 // Move bee toward their target.
                 // TODO need to add randomness to movement rather than the smooth lerp
+                // and speed adjustments
                 if (bee.Movement.Target != Entity.Null)
                 {
                     float3 diff = GetComponent<Translation>(bee.Movement.Target).Value - pos;
-                    transform.Position += diff * dt;
+                    transform.Position += diff * dt * 0.5f;
                 }
-
                //  /// STUB from tanks example
                //  // This does not modify the actual position of the tank, only the point at
                //  // which we sample the 3D noise function. This way, every tank is using a
