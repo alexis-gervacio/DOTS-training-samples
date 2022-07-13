@@ -20,7 +20,7 @@ struct Bee : IComponentData
     }
 }
 
-struct TargetFood : IComponentData
+struct FoodHeld : IComponentData
 {
     public Entity Food;
 }
