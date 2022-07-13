@@ -20,7 +20,8 @@ public partial class BeeSpawnSystem : SystemBase
 
             foreach (var bee in bees)
             {
-                ecb.SetComponent(bee, new Translation() {Value = spawner.SpawnPoint});
+                ecb.SetComponent(bee, new Translation() { Value = spawner.SpawnPoint });
+                
             }
         }).Run();
         

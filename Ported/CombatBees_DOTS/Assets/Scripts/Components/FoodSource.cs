@@ -1,9 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using Unity.Entities;
-using UnityEngine;
 
-struct FoodSource : IComponentData
+[Serializable]
+[GenerateAuthoringComponent]
+public struct FoodSource : IComponentData
 {
-    public Vector3 Position;
 }

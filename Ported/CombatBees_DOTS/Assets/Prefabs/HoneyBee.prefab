@@ -18,6 +18,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: HoneyBee
       objectReference: {fileID: 0}
+    - target: {fileID: 3075534902896596658, guid: a8851bc432aa8424d94d7a94121e3085,
+        type: 3}
+      propertyPath: Faction
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3075534902896596659, guid: a8851bc432aa8424d94d7a94121e3085,
         type: 3}
       propertyPath: m_RootOrder
